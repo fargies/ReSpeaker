@@ -7,47 +7,47 @@
 3. Configure the "Voice assistants" from Settings menu then "Add assistant"
 4. Configure the device (wake-word, volume etc...) and hook it to the voice-assistant by going to its configuration menu
 
-
 ### Using custom STT
 
 Install [Wyoming Protocol](https://www.home-assistant.io/integrations/wyoming) integration.
 
 1. Deploy a [hass-piper](https://www.home-assistant.io/integrations/piper/) container (docker-compose example):
-```yaml
-services:
-  hass-piper:
-    container_name: hass-piper
-    image: rhasspy/wyoming-piper
-    volumes:
-        - /volume1/docker/home-assistant/piper/data:/data
-    command:
-        --voice fr_FR-gilles-low
-        --update-voices
-    ports:
-        - 127.0.0.1:10200:10200
-        - 127.0.0.1:15000:5000
-    restart: unless-stopped
-    networks: [ default ]
-```
 
-2. Deploy a custom [hass-sherpa-onnyx]() container (docker-compose example):
-```yaml
-services:
-  hass-sherpa-onnyx:
-    container_name: hass-sherpa-onnyx
-    build:
-      pull: true
-      no_cache: true
-      context: https://github.com/fargies/sherpa-onnx-tts-stt.git#wip-new-models
-      args:
-        LANGUAGE: "fr-FR"
-        PREFETCH: 1
-    environment:
-      STT_USE_ONLINE_PROCESSING: 1
-    ports:
-      - 10401:10400
-    restart: unless-stopped
-```
+    ```yaml
+    services:
+      hass-piper:
+        container_name: hass-piper
+        image: rhasspy/wyoming-piper
+        volumes:
+          - /volume1/docker/home-assistant/piper/data:/data
+        command: --voice fr_FR-gilles-low
+          --update-voices
+        ports:
+          - 127.0.0.1:10200:10200
+          - 127.0.0.1:15000:5000
+        restart: unless-stopped
+        networks: [default]
+    ```
+
+2. Deploy a custom *hass-sherpa-onnyx* container (docker-compose example):
+
+    ```yaml
+    services:
+      hass-sherpa-onnyx:
+        container_name: hass-sherpa-onnyx
+        build:
+          pull: true
+          no_cache: true
+          context: https://github.com/fargies/sherpa-onnx-tts-stt.git#wip-new-models
+          args:
+            LANGUAGE: "fr-FR"
+            PREFETCH: 1
+        environment:
+          STT_USE_ONLINE_PROCESSING: 1
+        ports:
+          - 10401:10400
+        restart: unless-stopped
+    ```
 
 3. Configure both in Wyoming Protocol integration
 
@@ -83,6 +83,7 @@ USB DFU press and hold mute button when powering the device
 ### ESP32 Update
 
 Using podman (also works with Docker):
+
 ```bash
 podman pull ghcr.io/esphome/esphome
 
@@ -95,29 +96,33 @@ ota_password: "xxx"
 
 # Compile and flash firmware
 podman run --rm --privileged \
-    -v "${PWD}/firmware/config":/config \
+    -v "${PWD}":/config \
     -v "${PWD}/firmware/root":/root \
     --device=/dev/ttyACM0 \
     -it ghcr.io/esphome/esphome run respeaker-xvf-satellite-example.yaml
 ```
 
 **Note:** to update Wifi configuration, not re-flashing the firmware, the
-following site may be used (only using **Chrome** from Windows/Mac and
-connecting the ESP32 device on USB): [web.esphome.io](https://web.esphome.io/)
+following sites may be used (**using Chrome** or **Chromium**,
+connecting the ESP32 device on USB):
+
+- [web.esphome.io](https://web.esphome.io/)
+- [improv-wifi.com](https://www.improv-wifi.com/)
 
 ### Debugging
 
 To get a console:
+
 ```bash
 # Direct console
 sudo minicom -D /dev/ttyACM0
 
 # Using ESPHome tools
 podman run --rm --privileged \
-    -v "${PWD}/firmware/config":/config \
+    -v "${PWD}":/config \
     -v "${PWD}/firmware/root":/root \
     --device=/dev/ttyACM0 \
-    -it ghcr.io/esphome/esphome logs respeaker-xvf-satellite-example.yaml
+    -it ghcr.io/esphome/esphome logs respeaker.yaml
 
 # One can also connect to https://web.esphome.io/
 ```

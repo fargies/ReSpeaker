@@ -1,0 +1,8 @@
+packages:
+  - !include firmware/config/respeaker-xvf-satellite-example.yaml
+  - wifi:
+      ap: {}
+    improv_serial:
+    captive_portal:
+    network:
+      enable_ipv6: false
