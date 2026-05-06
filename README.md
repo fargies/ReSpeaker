@@ -78,7 +78,7 @@ sudo dfu-util -R -e -a 1 -D ./firmware/application_xvf3800_inthost-lr48-sqr-i2c-
 ```
 
 **Note:** I2C firmware doesn't support USB DFU, to enter safe-mode and enable
-USB DFU press and hold mute button when powering the device
+USB DFU press and hold mute button when powering the device (see <https://wiki.seeedstudio.com/respeaker_xvf3800_introduction/#safe-mode>)
 
 ### ESP32 Update
 
@@ -125,6 +125,27 @@ podman run --rm --privileged \
     -it ghcr.io/esphome/esphome logs respeaker.yaml
 
 # One can also connect to https://web.esphome.io/
+```
+
+#### Direct control/tests
+
+```bash
+$ python -m venv venv
+$ source venv/bin/activate
+
+$ python -m asyncio
+
+import aioesphomeapi
+
+api = aioesphomeapi.APIClient("192..168.3.33", 6053, "")
+await api.connect()
+entities = await api.list_entities_services()
+key = next(filter(lambda x: x.object_id == 'media_player', entities[0])).key
+
+# from https://filesamples.com/formats/flac
+api.media_player_command(key, command=0, media_url="https://dl.espressif.com/dl/audio/gs-16b-2c-44100hz.flac")
+api.media_player_command(key, command=0, media_url="https://dl.espressif.com/dl/audio/ff-16b-2c-44100hz.flac")
+api.media_player_command(key, command=0, media_url="https://filesamples.com/samples/audio/flac/sample4.flac")
 ```
 
 ## External Links
